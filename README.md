@@ -14,6 +14,8 @@ aws_access_key_id =  <key>
 aws_secret_access_key = <secret>
 ```
 
+This also assumes you have terraform 0.12.6 or later installed.
+
 ## DEPLOYING
 
 If you want to deploy to staging: 
@@ -23,13 +25,16 @@ If you want to deploy to staging:
 * In the `sqs` directory, run `terraform init` (one time) and then `terraform apply`
 * In the `lambda` directory, run `terraform init` (one time) and then `terraform apply`
 
+For further changes, just run `terraform apply` as normal.
+
 If you want to deploy to production, we need to tell Terraform to use a different backend (because we want to use a separate bucket in the production account). 
 
 * run git clone of this repo: `git clone git@github.com:mooreds/terraform-remote-state-example.git production-terraform-remote-state-example` (one time)
 * Set up terraform with an s3 backend provider (more here: https://www.terraform.io/docs/backends/types/s3.html ) (one time) 
-* In the `sqs` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=mooreds-terraform-remote-state-example-production"` (one time) and then `terraform apply`
-* In the `lambda` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=mooreds-terraform-remote-state-example-production"` (one time) and then `terraform apply`
+* In the `sqs` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=mooreds-terraform-remote-state-example-production"` (one time) and then `prodapply.sh`
+* In the `lambda` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=mooreds-terraform-remote-state-example-production"` (one time) and then `prodapply.sh`
 
+For further changes, just run `prodapply.sh`.
 
 Note: do not try to switch between backend providers in the same repo. This seems simpler, but just caused issues for me.
 
