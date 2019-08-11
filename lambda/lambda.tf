@@ -30,11 +30,17 @@ variable "lambda_function_name" {
   description = "Lambda function name"
 }
 
+variable "lambda_memory_size" {
+  default     = "128"
+  description = "Amount of memory available to the lambda"
+}
+
 
 resource "aws_lambda_function" "mylambda" {
   filename      = "${data.archive_file.lambda.output_path}"
   function_name = "${var.lambda_function_name}"
   role          = "${aws_iam_role.iam_for_lambda.arn}"
+  memory_size   = "${var.lambda_memory_size}"
   handler       = "lambda.handler"
 
   source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
