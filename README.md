@@ -18,17 +18,18 @@ aws_secret_access_key = <secret>
 
 If you want to deploy to staging: 
 
-* run git clone of this repo: `git clone git@github.com:mooreds/terraform-remote-state-example.git`
-* Set up terraform with an s3 backend provider (more here: https://www.terraform.io/docs/backends/types/s3.html ). 
-* In the `sqs` directory, run `terraform init` and then `terraform apply`
-* In the `lambda` directory, run `terraform init` and then `terraform apply`
+* run git clone of this repo: `git clone git@github.com:mooreds/terraform-remote-state-example.git` (one time)
+* Set up terraform with an s3 backend provider (more here: https://www.terraform.io/docs/backends/types/s3.html ) (one time)
+* In the `sqs` directory, run `terraform init` (one time) and then `terraform apply`
+* In the `lambda` directory, run `terraform init` (one time) and then `terraform apply`
 
 If you want to deploy to production, we need to tell Terraform to use a different backend (because we want to use a separate bucket in the production account). 
 
-* run git clone of this repo: `git clone git@github.com:mooreds/terraform-remote-state-example.git production-terraform-remote-state-example`
-* Set up terraform with an s3 backend provider (more here: https://www.terraform.io/docs/backends/types/s3.html ). 
-* In the `sqs` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=mooreds-terraform-remote-state-example-production"` and then `terraform apply`
-* In the `lambda` directory, run `terraform init` and then `terraform apply`
+* run git clone of this repo: `git clone git@github.com:mooreds/terraform-remote-state-example.git production-terraform-remote-state-example` (one time)
+* Set up terraform with an s3 backend provider (more here: https://www.terraform.io/docs/backends/types/s3.html ) (one time) 
+* In the `sqs` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=mooreds-terraform-remote-state-example-production"` (one time) and then `terraform apply`
+* In the `lambda` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=mooreds-terraform-remote-state-example-production"` (one time) and then `terraform apply`
+
 
 Note: do not try to switch between backend providers in the same repo. This seems simpler, but just caused issues for me.
 
