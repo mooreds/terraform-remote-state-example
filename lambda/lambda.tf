@@ -47,8 +47,46 @@ resource "aws_lambda_function" "mylambda" {
 
   environment {
     variables = {
-      foo = "bar"
+      sqs_url = "${data.terraform_remote_state.sqs.outputs.queue_url}"
     }
   }
   depends_on    = ["aws_iam_role_policy_attachment.lambda_logs", "aws_cloudwatch_log_group.example"]
+}
+
+data "terraform_remote_state" "sqs" {
+  backend = "s3"
+  config = {
+    bucket = "${var.terraform_bucket}"
+    key = "sqs/terraform.tfstate"
+    encrypt = true
+    dynamodb_table = "terraform-remote-state-locks"
+    profile = "${var.aws_profile}"
+    region = "us-east-2"
+  }
+}
+
+resource "aws_iam_policy" "lambda_sqs_access" {
+  name = "lambda_sqs_access"
+  path = "/"
+  description = "IAM policy for sqs access from a lambda"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "sqs:SendMessage"
+      ],
+      "Resource": "${data.terraform_remote_state.sqs.outputs.queue_arn}",
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_sqs_access" {
+  role = "${aws_iam_role.iam_for_lambda.name}"
+  policy_arn = "${aws_iam_policy.lambda_sqs_access.arn}"
 }
