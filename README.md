@@ -2,7 +2,7 @@
 
 This system consists of two terraform modules. One is an SQS queue and the other is a lambda that puts things on the SQS queue. The queue is created and the url and other needed attributes are dynamically injected into the lambda.
 
-This also supports a production and staging environment, which are in separate accounts. They are assumed to be in the same region, but that is just to make things easier. It is assumed that the user running terraform has appropriate permissions and the following entries in their ~/.aws/credentials file.
+This also supports a production and staging environment (with different buckets but the same dynamodb table names), which are in separate accounts. They are assumed to be in the same region, but that is just to make things easier. It is assumed that the user running terraform has appropriate permissions and the following entries in their ~/.aws/credentials file.
 
 ```
 [trsstaging]
@@ -20,21 +20,23 @@ This also assumes you have terraform 0.12.6 or later installed.
 
 If you want to deploy to staging: 
 
-* run git clone of this repo: `git clone git@github.com:mooreds/terraform-remote-state-example.git` (one time)
-* Set up terraform with an s3 backend provider (more here: https://www.terraform.io/docs/backends/types/s3.html ) (one time)
-* In the `sqs` directory, run `terraform init` (one time) and then `terraform apply`
-* In the `lambda` directory, run `terraform init` (one time) and then `terraform apply`
+* run git clone of this repo: `git clone git@github.com:mooreds/terraform-remote-state-example.git` 
+* Set up terraform with an s3 backend provider (more here: https://www.terraform.io/docs/backends/types/s3.html ) 
+* Edit the providers to point to the correct bucket.
+* In the `sqs` directory, run `terraform init` and then `terraform apply`
+* In the `lambda` directory, run `terraform init` and then `terraform apply`
 
 For further changes, just run `terraform apply` as normal.
 
 If you want to deploy to production, we need to tell Terraform to use a different backend (because we want to use a separate bucket in the production account). 
 
-* run git clone of this repo: `git clone git@github.com:mooreds/terraform-remote-state-example.git production-terraform-remote-state-example` (one time)
+* run git clone of this repo: `git clone git@github.com:mooreds/terraform-remote-state-example.git production-terraform-remote-state-example`
 * Set up terraform with an s3 backend provider (more here: https://www.terraform.io/docs/backends/types/s3.html ) (one time) 
-* In the `sqs` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=mooreds-terraform-remote-state-example-production"` (one time) and then `prodapply.sh`
-* In the `lambda` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=mooreds-terraform-remote-state-example-production"` (one time) and then `prodapply.sh`
+* Edit the `prodapply.sh` scripts to point to the correct bucket.
+* In the `sqs` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=<bucketname>"` and then `prodapply.sh`
+* In the `lambda` directory, run `terraform init -backend-config="profile=trsproduction" -backend-config="bucket=<bucketname>"` and then `prodapply.sh`
 
-For further changes, just run `prodapply.sh`.
+For further changes, just run `prodapply.sh`. If you want to run `terraform plan` just copy `prodapply.sh` to `prodplan.sh` and modify the terraform command.
 
 Note: do not try to switch between backend providers in the same repo. This seems simpler, but just caused issues for me.
 
